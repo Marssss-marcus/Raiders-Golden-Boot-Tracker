@@ -39,7 +39,7 @@ tr:nth-child(even){
 
 <body>
 
-<h1>⚽ Rockdale Raiders Golden Boot Tracker</h1>
+<h1> Rockdale Raiders Golden Boot Tracker</h1>
 
 <p id="status">Loading...</p>
 
@@ -68,30 +68,30 @@ const API_KEY = "4e3a47f94a4d25a9372ef9e788240186";
 // DRAW
 // ==========================
 const players = [
-{name:"Dec",player:"Vinícius Júnior",country:"Brazil"},
-{name:"Luka",player:"Raphinha",country:"Brazil"},
-{name:"Zyler",player:"Kai Havertz",country:"Germany"},
-{name:"Myles",player:"Romelu Lukaku",country:"Belgium"},
-{name:"Galen",player:"Lautaro Martínez",country:"Argentina"},
-{name:"Jayden",player:"Harry Kane",country:"England"},
-{name:"Sam",player:"Erling Haaland",country:"Norway"},
-{name:"Chanel",player:"Lamine Yamal",country:"Spain"},
-{name:"George",player:"Julián Álvarez",country:"Argentina"},
-{name:"Rahil",player:"Ousmane Dembélé",country:"France"},
-{name:"Daniel",player:"Jude Bellingham",country:"England"},
-{name:"Deon",player:"Alexander Isak",country:"Sweden"},
-{name:"Xavier F",player:"Bukayo Saka",country:"England"},
-{name:"Olive",player:"Luis Díaz",country:"Colombia"},
-{name:"Josh",player:"Mikel Oyarzabal",country:"Spain"},
-{name:"Pauly",player:"Lionel Messi",country:"Argentina"},
-{name:"Charlie",player:"Cristiano Ronaldo",country:"Portugal"},
-{name:"Riley",player:"Mohamed Salah",country:"Egypt"},
-{name:"Anthony",player:"Marcus Rashford",country:"England"},
-{name:"Anne",player:"Kylian Mbappé",country:"France"},
-{name:"Aiden",player:"Sadio Mané",country:"Senegal"},
-{name:"Ollie",player:"Cody Gakpo",country:"Netherlands"},
-{name:"Xavier T",player:"Bruno Fernandes",country:"Portugal"},
-{name:"Marcus",player:"Christian Pulisic",country:"USA"}
+{name:"Dec",player:"Vinícius Júnior"},
+{name:"Luka",player:"Raphinha"},
+{name:"Zyler",player:"Kai Havertz"},
+{name:"Myles",player:"Romelu Lukaku"},
+{name:"Galen",player:"Lautaro Martínez"},
+{name:"Jayden",player:"Harry Kane"},
+{name:"Sam",player:"Erling Haaland"},
+{name:"Chanel",player:"Lamine Yamal"},
+{name:"George",player:"Julián Álvarez"},
+{name:"Rahil",player:"Ousmane Dembélé"},
+{name:"Daniel",player:"Jude Bellingham"},
+{name:"Deon",player:"Alexander Isak"},
+{name:"Xavier F",player:"Bukayo Saka"},
+{name:"Olive",player:"Luis Díaz"},
+{name:"Josh",player:"Mikel Oyarzabal"},
+{name:"Pauly",player:"Lionel Messi"},
+{name:"Charlie",player:"Cristiano Ronaldo"},
+{name:"Riley",player:"Mohamed Salah"},
+{name:"Anthony",player:"Marcus Rashford"},
+{name:"Anne",player:"Kylian Mbappé"},
+{name:"Aiden",player:"Sadio Mané"},
+{name:"Ollie",player:"Cody Gakpo"},
+{name:"Xavier T",player:"Bruno Fernandes"},
+{name:"Marcus",player:"Christian Pulisic"}
 ];
 
 // ==========================
@@ -166,8 +166,8 @@ async function update(){
 // Run immediately
 update();
 
-// Update every 30 minutes
-setInterval(update,1800000);
+// Update every 10 minutes
+setInterval(update,600000);
 
 </script>
 
