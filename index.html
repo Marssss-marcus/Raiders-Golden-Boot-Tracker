@@ -54,21 +54,21 @@ tr:nth-child(even){
 </thead>
 
 <tbody id="board"></tbody>
-
 </table>
 
 <script>
 
 // ==========================
-// PUT YOUR API KEY HERE
+// DATA SOURCE
 // ==========================
-const API_KEY = "4e3a47f94a4d25a9372ef9e788240186";
+const WIKIPEDIA_API_URL =
+"https://en.wikipedia.org/w/api.php?action=parse&page=2026_FIFA_World_Cup&prop=text&format=json&origin=*";
 
 // ==========================
 // DRAW
 // ==========================
 const players = [
-{name:"Dec",player:"Vinicius Junior",aliases:["Vinicius Jr","Vinicius Jr."]},
+{name:"Dec",player:"Vinicius Junior",aliases:["Vinicius","Vinícius","Vinícius Júnior","Vinicius Jr","Vinicius Jr."]},
 {name:"Luka",player:"Raphinha"},
 {name:"Zyler",player:"Kai Havertz"},
 {name:"Myles",player:"Romelu Lukaku"},
@@ -96,25 +96,75 @@ const players = [
 
 let goals = {};
 
+// ==========================
+// HELPERS
+// ==========================
 function normalizeName(name){
-    return name
-        .normalize("NFD")
-        .replace(/[\u0300-\u036f]/g, "")
-        .toLowerCase();
+return name
+.normalize("NFD")
+.replace(/[\u0300-\u036f]/g, "")
+.toLowerCase();
+}
+
+function addGoal(name){
+const normalized = normalizeName(name);
+goals[normalized] = (goals[normalized] ?? 0) + 1;
 }
 
 function getGoalsForPlayer(player){
-    const namesToCheck = [player.player, ...(player.aliases ?? [])];
+const namesToCheck = [player.player, ...(player.aliases ?? [])];
 
-    for(const name of namesToCheck){
-        const goalsForName = goals[normalizeName(name)];
+for(const name of namesToCheck){
+const normalized = normalizeName(name);
+if(goals[normalized] !== undefined){
+return goals[normalized];
+}
+}
+return 0;
+}
 
-        if(goalsForName !== undefined){
-            return goalsForName;
-        }
-    }
+function getScorerName(goalItem){
+const link = goalItem.querySelector("a[title]");
+if(link) return link.getAttribute("title");
+return goalItem.textContent.split("\n")[0].trim();
+}
 
-    return 0;
+function countGoalsFromWikipedia(html){
+const page = new DOMParser().parseFromString(html, "text/html");
+
+goals = {};
+
+page.querySelectorAll(".fgoals li").forEach(goalItem => {
+const isGoal = goalItem.querySelector(".fb-goal");
+const isOwnGoal = goalItem.textContent.includes("o.g.");
+
+if(isGoal && !isOwnGoal){
+addGoal(getScorerName(goalItem));
+}
+});
+}
+
+function buildRows(){
+return players.map(p => ({
+person: p.name,
+player: p.player,
+goals: getGoalsForPlayer(p)
+}));
+}
+
+function drawRows(rows){
+const tbody = document.getElementById("board");
+tbody.innerHTML = "";
+
+rows.forEach(row => {
+tbody.innerHTML += `
+<tr>
+<td>${row.person}</td>
+<td>${row.player}</td>
+<td>${row.goals}</td>
+</tr>
+`;
+});
 }
 
 // ==========================
@@ -122,73 +172,41 @@ function getGoalsForPlayer(player){
 // ==========================
 async function update(){
 
-    document.getElementById("status").innerText = "Updating...";
+document.getElementById("status").innerText = "Updating...";
 
-    try{
+try{
 
-        const response = await fetch(
-            "https://v3.football.api-sports.io/players/topscorers?league=1&season=2026",
-            {
-                headers:{
-                    "x-apisports-key": API_KEY
-                }
-            }
-        );
+const response = await fetch(WIKIPEDIA_API_URL);
 
-        if(!response.ok){
-            throw new Error(`API failed with status ${response.status}`);
-        }
+if(!response.ok){
+throw new Error(`Wikipedia API failed with status ${response.status}`);
+}
 
-        const data = await response.json();
+const data = await response.json();
 
-        console.log("API Response:", data);
+if(!data.parse?.text?.["*"]){
+throw new Error("Wikipedia data did not include the page HTML");
+}
 
-        goals = {};
+countGoalsFromWikipedia(data.parse.text["*"]);
 
-        if(data.response){
+const latestRows = buildRows();
+drawRows(latestRows);
 
-            data.response.forEach(p => {
+const now = new Date();
+const updateLabel =
+`${now.toLocaleTimeString([], {hour:"2-digit", minute:"2-digit"})} ${now.toLocaleDateString([], {day:"numeric", month:"numeric"})}`;
 
-                const name = p.player?.name;
-                const total = p.statistics?.[0]?.goals?.total ?? 0;
+document.getElementById("status").innerText =
+`Last updated ${updateLabel}`;
 
-                if(name){
-                    goals[normalizeName(name)] = total;
-                }
+}
 
-            });
-
-        }
-
-        const tbody = document.getElementById("board");
-        tbody.innerHTML = "";
-
-        players.forEach(p => {
-
-            const g = getGoalsForPlayer(p);
-
-            tbody.innerHTML += `
-            <tr>
-                <td>${p.name}</td>
-                <td>${p.player}</td>
-                <td>${g}</td>
-            </tr>
-            `;
-
-        });
-
-        document.getElementById("status").innerText = "Updated OK";
-
-    }
-
-    catch(error){
-
-        console.log("ERROR:", error);
-
-        document.getElementById("status").innerText =
-            "API Error - check console";
-
-    }
+catch(error){
+console.log("ERROR:", error);
+document.getElementById("status").innerText =
+"Update error - check console";
+}
 }
 
 // Run immediately
