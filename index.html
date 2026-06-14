@@ -98,8 +98,7 @@ const players = [
 // ==========================
 async function update(){
 
-    document.getElementById("status").innerText =
-        "Updating...";
+    document.getElementById("status").innerText = "Updating...";
 
     try{
 
@@ -107,65 +106,69 @@ async function update(){
             "https://v3.football.api-sports.io/players/topscorers?league=1&season=2026",
             {
                 headers:{
-                    "x-apisports-key":API_KEY
+                    "x-rapidapi-key": API_KEY,
+                    "x-rapidapi-host": "v3.football.api-sports.io"
                 }
             }
         );
 
         const data = await response.json();
 
-        console.log("API Response:",data);
+        console.log("API Response:", data);
 
         let goals = {};
 
         if(data.response){
 
-            data.response.forEach(p=>{
+            data.response.forEach(p => {
 
-                goals[p.player.name] =
-                    p.statistics[0].goals.total;
+                const name = p.player?.name;
+                const total = p.statistics?.[0]?.goals?.total ?? 0;
+
+                if(name){
+                    goals[name] = total;
+                }
 
             });
 
         }
 
         const tbody = document.getElementById("board");
-
         tbody.innerHTML = "";
 
-        players.forEach(p=>{
+        players.forEach(p => {
+
+            const g = goals[p.player] ?? 0;
 
             tbody.innerHTML += `
             <tr>
                 <td>${p.name}</td>
                 <td>${p.player}</td>
-                <td>${goals[p.player] || 0}</td>
+                <td>${g}</td>
             </tr>
             `;
 
         });
 
-        document.getElementById("status").innerText =
-            "Updated ✔";
+        document.getElementById("status").innerText = "Updated ✔";
 
     }
 
     catch(error){
 
-        console.log("ERROR:",error);
+        console.log("ERROR:", error);
 
         document.getElementById("status").innerText =
-            "API Error - Press F12 and open Console";
+            "API Error - check console";
 
     }
-
 }
 
 // Run immediately
 update();
 
 // Update every 10 minutes
-setInterval(update,600000);
+setInterval(update, 600000);
 
 </script>
 
