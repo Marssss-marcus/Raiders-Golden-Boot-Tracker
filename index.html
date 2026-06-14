@@ -1,6 +1,7 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html>
 <head>
+<meta charset="UTF-8">
 <title>Rockdale Raiders Golden Boot Tracker</title>
 
 <style>
@@ -39,7 +40,7 @@ tr:nth-child(even){
 
 <body>
 
-<h1> Rockdale Raiders Golden Boot Tracker</h1>
+<h1>Rockdale Raiders Golden Boot Tracker</h1>
 
 <p id="status">Loading...</p>
 
@@ -67,31 +68,54 @@ const API_KEY = "4e3a47f94a4d25a9372ef9e788240186";
 // DRAW
 // ==========================
 const players = [
-{name:"Dec",player:"Vinícius Júnior"},
+{name:"Dec",player:"Vinicius Junior",aliases:["Vinicius Jr","Vinicius Jr."]},
 {name:"Luka",player:"Raphinha"},
 {name:"Zyler",player:"Kai Havertz"},
 {name:"Myles",player:"Romelu Lukaku"},
-{name:"Galen",player:"Lautaro Martínez"},
+{name:"Galen",player:"Lautaro Martinez"},
 {name:"Jayden",player:"Harry Kane"},
 {name:"Sam",player:"Erling Haaland"},
 {name:"Chanel",player:"Lamine Yamal"},
-{name:"George",player:"Julián Álvarez"},
-{name:"Rahil",player:"Ousmane Dembélé"},
+{name:"George",player:"Julian Alvarez"},
+{name:"Rahil",player:"Ousmane Dembele"},
 {name:"Daniel",player:"Jude Bellingham"},
 {name:"Deon",player:"Alexander Isak"},
 {name:"Xavier F",player:"Bukayo Saka"},
-{name:"Olive",player:"Luis Díaz"},
+{name:"Olive",player:"Luis Diaz"},
 {name:"Josh",player:"Mikel Oyarzabal"},
 {name:"Pauly",player:"Lionel Messi"},
 {name:"Charlie",player:"Cristiano Ronaldo"},
 {name:"Riley",player:"Mohamed Salah"},
 {name:"Anthony",player:"Marcus Rashford"},
-{name:"Anne",player:"Kylian Mbappé"},
-{name:"Aiden",player:"Sadio Mané"},
+{name:"Anne",player:"Kylian Mbappe"},
+{name:"Aiden",player:"Sadio Mane"},
 {name:"Ollie",player:"Cody Gakpo"},
 {name:"Xavier T",player:"Bruno Fernandes"},
 {name:"Marcus",player:"Christian Pulisic"}
 ];
+
+let goals = {};
+
+function normalizeName(name){
+    return name
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "")
+        .toLowerCase();
+}
+
+function getGoalsForPlayer(player){
+    const namesToCheck = [player.player, ...(player.aliases ?? [])];
+
+    for(const name of namesToCheck){
+        const goalsForName = goals[normalizeName(name)];
+
+        if(goalsForName !== undefined){
+            return goalsForName;
+        }
+    }
+
+    return 0;
+}
 
 // ==========================
 // UPDATE FUNCTION
@@ -106,17 +130,20 @@ async function update(){
             "https://v3.football.api-sports.io/players/topscorers?league=1&season=2026",
             {
                 headers:{
-                    "x-rapidapi-key": API_KEY,
-                    "x-rapidapi-host": "v3.football.api-sports.io"
+                    "x-apisports-key": API_KEY
                 }
             }
         );
+
+        if(!response.ok){
+            throw new Error(`API failed with status ${response.status}`);
+        }
 
         const data = await response.json();
 
         console.log("API Response:", data);
 
-        let goals = {};
+        goals = {};
 
         if(data.response){
 
@@ -126,7 +153,7 @@ async function update(){
                 const total = p.statistics?.[0]?.goals?.total ?? 0;
 
                 if(name){
-                    goals[name] = total;
+                    goals[normalizeName(name)] = total;
                 }
 
             });
@@ -138,7 +165,7 @@ async function update(){
 
         players.forEach(p => {
 
-            const g = goals[p.player] ?? 0;
+            const g = getGoalsForPlayer(p);
 
             tbody.innerHTML += `
             <tr>
@@ -150,7 +177,7 @@ async function update(){
 
         });
 
-        document.getElementById("status").innerText = "Updated ✔";
+        document.getElementById("status").innerText = "Updated OK";
 
     }
 
