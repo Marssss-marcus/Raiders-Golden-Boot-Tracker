@@ -145,11 +145,21 @@ addGoal(getScorerName(goalItem));
 }
 
 function buildRows(){
-return players.map(p => ({
-person: p.name,
-player: p.player,
-goals: getGoalsForPlayer(p)
-}));
+    return players
+        .map(p => ({
+            person: p.name,
+            player: p.player,
+            goals: getGoalsForPlayer(p)
+        }))
+        .sort((a, b) => {
+            // Higher goals first
+            if (b.goals !== a.goals){
+                return b.goals - a.goals;
+            }
+
+            // If tied, sort alphabetically by person's name
+            return a.person.localeCompare(b.person);
+        });
 }
 
 function drawRows(rows){
