@@ -100,10 +100,14 @@ let goals = {};
 // HELPERS
 // ==========================
 function normalizeName(name){
-return name
-.normalize("NFD")
-.replace(/[\u0300-\u036f]/g, "")
-.toLowerCase();
+    return name
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "")
+        .toLowerCase()
+        .replace(/\(.*?\)/g, "")
+        .replace(/[^a-z\s]/g, "")
+        .replace(/\s+/g, " ")
+        .trim();
 }
 
 function addGoal(name){
