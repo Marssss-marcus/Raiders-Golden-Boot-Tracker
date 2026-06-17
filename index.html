@@ -200,6 +200,8 @@ throw new Error("Wikipedia data did not include the page HTML");
 
 countGoalsFromWikipedia(data.parse.text["*"]);
 
+console.log(goals);
+
 const latestRows = buildRows();
 drawRows(latestRows);
 
