@@ -134,6 +134,8 @@ const page = new DOMParser().parseFromString(html, "text/html");
 
 goals = {};
 
+console.log(page.querySelectorAll(".fgoals li").length);
+
 page.querySelectorAll(".fgoals li").forEach(goalItem => {
 const isGoal = goalItem.querySelector(".fb-goal");
 const isOwnGoal = goalItem.textContent.includes("o.g.");
